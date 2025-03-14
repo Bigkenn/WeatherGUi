@@ -12,6 +12,8 @@ public class Applauncher {
 
                 //              System.out.println(Weatherapp.getLocationData("Tokyo"));
                 //              System.out.println(Weatherapp.getCurrentTime());
+                //              System.out.println(Weatherapp.getWeatherData("Tokyo"));
+                //              kennedy remmeber to add the cast sensitive to the weather condition search bar
             }
         });
     }
