@@ -99,59 +99,61 @@ public class WeatherAppGUI extends JFrame {
         // search button
         JButton searchButton = new JButton(loadImage("src/Assets/search.png"));
 
-        // change the cursor to a hand cursor when horvering over thid button
         searchButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         searchButton.setBounds(375, 13, 47, 45);
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // get location from user
-                String userInput = searchTextField.getText();
+                try {
+                    // get location from user
+                    String userInput = searchTextField.getText().trim();
 
-                // validate input - remove whitespace to ensure non-empty text
-                if (userInput.replaceAll("\\s", "").length() <= 0) {
-                    return;
+                    // validate input - ensure non-empty text
+                    if (userInput.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "Please enter a location.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    // retrieve weather data
+                    weatherData = Weatherapp.getWeatherData(userInput);
+
+                    if (weatherData == null || weatherData.isEmpty()) {
+                        throw new Exception("Invalid location. No weather data found.");
+                    }
+
+                    // update weather image based on condition
+                    String weatherCondition = (String) weatherData.get("weather_condition");
+                    switch (weatherCondition) {
+                        case "Clear":
+                            weatherConditionImage.setIcon(loadImage("src/Assets/weather_10603913.png"));
+                            break;
+                        case "Cloudy":
+                            weatherConditionImage.setIcon(loadImage("src/Assets/windy_10076603 copy.png"));
+                            break;
+                        case "Rain":
+                            weatherConditionImage.setIcon(loadImage("src/Assets/night_16179267.png"));
+                            break;
+                        case "Snow":
+                            weatherConditionImage.setIcon(loadImage("src/Assets/winter_10991031 (1).png"));
+                            break;
+                        default:
+                            weatherConditionImage.setIcon(null); // No image available
+                    }
+
+                    // update weather details
+                    double temperature = (double) weatherData.get("temperature");
+                    temperatureText.setText(temperature + " C");
+
+                    weatherConditionDesc.setText(weatherCondition);
+
+                    long humidity = (long) weatherData.get("humidity");
+                    humidityText.setText("<html><b>Humidity</b> " + humidity + "%</html>");
+
+                    double windspeed = (double) weatherData.get("windspeed");
+                    windSpeedText.setText("<html><b>Windspeed</b> " + windspeed + "km/h</html>");
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage(), "Weather Error", JOptionPane.ERROR_MESSAGE);
                 }
-
-                // check id user enters an invalid country, city or location
-                // retrieve weather data
-                weatherData = Weatherapp.getWeatherData(userInput);
-
-                // update gui
-                // update weaher image
-                String weatherCondition = (String) weatherData.get("weather_condition");
-
-                // depending on the condition we can update the weather image that corresponds with the condition
-                switch (weatherCondition) {
-                    case "Clear":
-                        weatherConditionImage.setIcon(loadImage("src/Assets/weather_10603913.png"));
-                        break;
-                    case "Cloudy":
-                        weatherConditionImage.setIcon(loadImage("src/Assets/windy_10076603 copy.png"));
-                        break;
-                    case "Rain":
-                        weatherConditionImage.setIcon(loadImage("src/Assets/night_16179267.png"));
-                        break;
-                    case "Snow":
-                        weatherConditionImage.setIcon(loadImage("src/Assets/winter_10991031 (1).png"));
-                        break;
-
-                }
-
-                // update temperature text
-                double temperature = (double) weatherData.get("temperature");
-                temperatureText.setText(temperature + " C");
-
-                // update weather condition text
-                weatherConditionDesc.setText(weatherCondition);
-
-                // update humidity text
-                long humidity = (long) weatherData.get("humidity");
-                humidityText.setText("<html><b>Humidity</b> " + humidity + "%</html>");
-
-                // update windspeed text
-                double windspeed = (double) weatherData.get("windspeed");
-                windSpeedText.setText("<html><b>Windspeed</b> " + windspeed + "km/h</html>");
             }
         });
 
